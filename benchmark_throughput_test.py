@@ -1,11 +1,13 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
+
+import json
+import random
+import sys
+
+import pytest
+from transformers import AutoTokenizer
 
 import benchmark_throughput
-from transformers import AutoTokenizer
-import random
-import json
-import sys
-import pytest
 
 tokenizer = AutoTokenizer.from_pretrained('facebook/opt-6.7b')
 

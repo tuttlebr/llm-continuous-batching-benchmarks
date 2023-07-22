@@ -1,20 +1,21 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
-import math
-from enum import Enum
-from transformers import AutoTokenizer
-from typing import List
-import aiohttp
 import argparse
 import asyncio
 import itertools
 import json
+import math
 import os
 import random
-import requests
 import sys
 import time
+from enum import Enum
+from typing import List
+
+import aiohttp
 import numpy as np
+import requests
+from transformers import AutoTokenizer
 
 
 def get_wait_time(mean_time_between_requests: float, distribution: str) -> float:
@@ -71,7 +72,7 @@ async def query_model_hf(prompt, verbose, tokenizer, allow_variable_generation_l
 
         if verbose:
             print('Querying model')
-        async with session.post(f'http://localhost:{port}/generate', json=generate_input) as resp:
+        async with session.post(f'http://{os.getenv("BENCHMARK_IP")}:{port}/generate', json=generate_input) as resp:
             if verbose:
                 print('Done')
 
@@ -105,7 +106,7 @@ async def query_model_naive_hf(prompt, verbose, tokenizer, allow_variable_genera
 
         if verbose:
             print('Querying model')
-        async with session.post(f'http://localhost:{port}/generate', json=generate_input) as resp:
+        async with session.post(f'http://{os.getenv("BENCHMARK_IP")}:{port}/generate', json=generate_input) as resp:
             if verbose:
                 print('Done')
 
@@ -136,7 +137,7 @@ async def query_model_ray(prompt, verbose, tokenizer, allow_variable_generation_
 
         if verbose:
             print('Querying model')
-        async with session.post(f'http://localhost:{port}/generate', json=generate_input) as resp:
+        async with session.post(f'http://{os.getenv("BENCHMARK_IP")}:{port}/generate', json=generate_input) as resp:
             if verbose:
                 print('Done')
 
@@ -164,7 +165,7 @@ async def query_model_ft(prompt, verbose, tokenizer, allow_variable_generation_l
 
         if verbose:
             print('Querying model')
-        async with session.post(f'http://localhost:{port}/generate', json=generate_input) as resp:
+        async with session.post(f'http://{os.getenv("BENCHMARK_IP")}:{port}/generate', json=generate_input) as resp:
             if verbose:
                 print('Done')
 
@@ -203,7 +204,7 @@ async def query_model_vllm(prompt, verbose, tokenizer, allow_variable_generation
 
         if verbose:
             print('Querying model')
-        async with session.post(f'http://localhost:{port}/generate', json=generate_input) as resp:
+        async with session.post(f'http://{os.getenv("BENCHMARK_IP")}:{port}/generate', json=generate_input) as resp:
             if verbose:
                 print('Done')
 

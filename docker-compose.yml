@@ -1,0 +1,34 @@
+networks:
+  llm-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+
+services:
+  llm-benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VLLM_BRANCH=main
+    image: llm-benchmark
+    env_file:
+      - .env
+    networks:
+      llm-network:
+        ipv4_address: ${BENCHMARK_IP}
+    shm_size: 64gb
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    runtime: nvidia
+    working_dir: /benchmarking
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/data:/data
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/data/root_cache:/root/.cache
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/results:/results
+      - type: bind
+        source: .
+        target: /benchmarking
+    entrypoint: ["bash", "/benchmarking/entrypoint.sh"]

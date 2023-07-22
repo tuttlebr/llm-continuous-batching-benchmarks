@@ -2,11 +2,12 @@
 Utility for identifying the source of PyTorch memory leaks.
 """
 
-from collections import defaultdict
-import torch
 import gc
-
 import random
+from collections import defaultdict
+
+import torch
+
 a = []
 for _ in range(100):
     a.append(torch.ones(random.randint(1, 10), random.randint(5, 7)).to('cuda'))

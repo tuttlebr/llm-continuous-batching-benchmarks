@@ -15,7 +15,7 @@ function start_model_server {
         --max-batch-total-tokens $max_batch_total_tokens \
         2>&1 &
     
-    while [ "$(curl -s http://localhost:${PORT}/is_ready | grep true | wc -l)" -eq 0 ]; do
+    while [ "$(curl -s http://${BENCHMARK_IP}:${PORT}/is_ready | grep true | wc -l)" -eq 0 ]; do
         sleep 1
     done
     echo "model server started on port $PORT, max_batch_total_tokens $max_batch_total_tokens"

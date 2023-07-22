@@ -1,22 +1,17 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
-import torch
-import uvicorn
-from fastapi.responses import StreamingResponse
-from fastapi import FastAPI, Request
-from transformers import AutoTokenizer, AutoConfig, AutoModelForCausalLM, pipeline
-from queue import Queue
-import json
-from typing import List, Dict, Optional
-import time
-import asyncio
 import argparse
-from types import SimpleNamespace
-import subprocess
-import threading
-from dataclasses import dataclass
-from vllm import ServerArgs, LLMServer, SamplingParams
+import asyncio
 import os
+import threading
+import time
+from dataclasses import dataclass
+from queue import Queue
+from typing import Dict
+
+from fastapi import FastAPI, Request
+from vllm import EngineArgs, LLMEngine, SamplingParams
+
 os.environ["TRANSFORMERS_CACHE"] = '/data/cache'
 
 assert 'CUDA_VISIBLE_DEVICES' in os.environ, "Set CUDA_VISIBLE_DEVICES, else this will take memory on each (and load model to 0)"
@@ -88,7 +83,7 @@ class ModelThread:
 
             needs_call_progress = False
             for vllm_output in vllm_outputs:
-                if not vllm_output.finished():
+                if not vllm_output.finished:
                     continue
 
                 needs_call_progress = True
@@ -111,8 +106,8 @@ class ModelThread:
     @staticmethod
     def init_model(vllm_args):
         print('Init model')
-        server_args = ServerArgs.from_cli_args(vllm_args)
-        server = LLMServer.from_server_args(server_args)
+        server_args = EngineArgs.from_cli_args(vllm_args)
+        server = LLMEngine.from_engine_args(server_args)
         print('Model ready')
         return server
 
@@ -225,16 +220,16 @@ async def is_ready(request: Request):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, required=True)
-    ServerArgs.add_cli_args(parser)
+    EngineArgs.add_cli_args(parser)
     args = parser.parse_args()
 
-    vllm_args = ServerArgs.from_cli_args(args)
+    vllm_args = EngineArgs.from_cli_args(args)
 
     loop = asyncio.new_event_loop()
     server = FastAPIServer(loop, vllm_args)
 
     from uvicorn import Config, Server
-    config = Config(app=app, loop=loop, host='localhost',
+    config = Config(app=app, loop=loop, host=os.getenv("BENCHMARK_IP"),
                     port=args.port, log_level="info")
     uvicorn_server = Server(config)
 

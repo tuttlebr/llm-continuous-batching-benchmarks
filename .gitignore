@@ -1,1 +1,7 @@
 .*.swp
+data/
+results/
+benchmark_configs/ft_*
+benchmark_configs/hf_*
+benchmark_configs/naive_*
+benchmark_configs/ray_*

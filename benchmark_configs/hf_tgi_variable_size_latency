@@ -14,7 +14,7 @@ function start_model_server {
         ../launch_scripts/launch_text_generation_inference \
         >> tgi_log 2>&1 &
     
-    while [ "$(curl -s http://localhost:${PORT}/info | grep facebook/opt-13b | wc -l)" -eq 0 ]; do
+    while [ "$(curl -s http://${BENCHMARK_IP}:${PORT}/info | grep facebook/opt-13b | wc -l)" -eq 0 ]; do
         echo 'ping'
         sleep 1
     done

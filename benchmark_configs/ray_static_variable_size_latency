@@ -14,7 +14,7 @@ function start_model_server {
         --static-batch-size $static_batch_size \
         2>&1 &
     
-    while [ "$(curl -s http://localhost:${PORT}/is_ready | grep true | wc -l)" -eq 0 ]; do
+    while [ "$(curl -s http://${BENCHMARK_IP}:${PORT}/is_ready | grep true | wc -l)" -eq 0 ]; do
         sleep 1
     done
     echo "model server started on port $PORT, static_batch_size $static_batch_size"

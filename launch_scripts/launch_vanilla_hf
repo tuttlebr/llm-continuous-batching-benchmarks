@@ -1,17 +1,19 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
-import torch
-import uvicorn
-from fastapi.responses import StreamingResponse
-from fastapi import FastAPI, Request
-import deepspeed
-from transformers import AutoTokenizer, AutoConfig, AutoModelForCausalLM, pipeline
 import argparse
 import asyncio
-import time
-from typing import List, Dict, Optional
 import json
 import os
+import time
+from typing import Dict, List, Optional
+
+import deepspeed
+import torch
+import uvicorn
+from fastapi import FastAPI, Request
+from fastapi.responses import StreamingResponse
+from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline
+
 os.environ["TRANSFORMERS_CACHE"] = '/data/cache'
 
 assert 'CUDA_VISIBLE_DEVICES' in os.environ, "Set CUDA_VISIBLE_DEVICES, else this will take memory on each (and load model to 0)"
@@ -201,4 +203,4 @@ if __name__ == "__main__":
 
     server = FastAPIServer(args.model_name)
 
-    uvicorn.run(app, host='localhost', port=args.port, log_level="info")
+    uvicorn.run(app, host=os.getenv("BENCHMARK_IP"), port=args.port, log_level="info")
