@@ -10,7 +10,7 @@ function start_model_server {
         2>&1 &
 
     while [ "$(curl -s http://${BENCHMARK_IP}:${PORT}/is_ready | grep true | wc -l)" -eq 0 ]; do
-        sleep 1
+        sleep 5
     done
     echo "model server started on port $PORT"
 }
@@ -45,16 +45,16 @@ trap kill_model_server EXIT
 # done
 
 # Run real test
-for qps in 8 16 32; do
+for qps in ${QPS_RANGE}; do
     QPS=$qps
     range=1536
-    num_prompts=5000
+    num_prompts=${RANDOM_PROMPT_COUNT}
     echo "$range $num_prompts $QPS"
 
     start_model_server
 
     pushd ..
-        ulimit -n 65536 && /benchmarking/benchmark_throughput.py \
+        /benchmarking/benchmark_throughput.py \
             --port $PORT \
             --backend vLLM \
             --random_prompt_lens_mean ${RANDOM_PROMPT_LENS_MEAN} \
@@ -62,12 +62,12 @@ for qps in 8 16 32; do
             --random_prompt_count $num_prompts \
             --gen_random_prompts \
             --variable_response_lens_mean ${VARIABLE_RESPONSE_LENS_MEAN} \
-            --variable_response_lens_range $range \
+            --variable_response_lens_range ${VARIABLE_RESPONSE_LENS_RANGE} \
             --variable_response_lens_distribution capped_exponential \
-            --allow_variable_generation_length \
-            --results_filename /results/vllm_qps_${QPS}_numprompts_${num_promps}_range_${range}_$(date '+%Y-%m-%d_%H:%M:%S').log \
+            --results_filename /results/vllm_qps_${QPS}_numprompts_${num_prompts}_range_${range}_$(date '+%Y-%m-%d_%H:%M:%S').log \
             --distribution ${DISTRIBUTION} \
             --qps $QPS \
+            --allow_variable_generation_length \
             --log_latencies \
             --fail_on_response_failure
 
