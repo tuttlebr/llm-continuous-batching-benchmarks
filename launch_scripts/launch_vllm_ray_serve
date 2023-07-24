@@ -92,7 +92,7 @@ if __name__ == "__main__":
     parser.add_argument('--port', type=int, required=True)
     args = parser.parse_args()
 
-    model = 'facebook/opt-13b'
+    model = os.getenv("TRANSFORMERS_MODEL")
     deployment = VLLMPredictDeployment.bind(
         model=model, max_num_batched_tokens=8100, use_np_weights=True)
     serve.run(deployment, port=args.port)

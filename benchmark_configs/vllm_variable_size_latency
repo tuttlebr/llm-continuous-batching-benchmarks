@@ -6,8 +6,9 @@ function start_model_server {
         --port ${PORT} \
         --model ${TRANSFORMERS_MODEL} \
         --tokenizer ${TOKENIZER_MODEL} \
+        --pipeline-parallel-size ${PIPELINE_PARALLEL_SIZE} \
+        --tensor-parallel-size ${TENSOR_PARALLEL_SIZE} \
         --max-num-batched-tokens 8100 \
-        --use-np-weights \
         2>&1 &
 
     while [ "$(curl -s http://${BENCHMARK_IP}:${PORT}/is_ready | grep true | wc -l)" -eq 0 ]; do
@@ -23,27 +24,6 @@ function kill_model_server {
 }
 
 trap kill_model_server EXIT
-
-# Catch OOMs early.
-# for i in ${!ranges[@]}; do
-#     range=${ranges[$i]}
-#     echo "$range"
-
-#     start_model_server
-
-#     pushd ..
-#         /benchmarking/benchmark_throughput.py \
-#             --port $PORT \
-#             --backend vLLM \
-#             --random_prompt_lens_mean 512 \
-#             --random_prompt_lens_range 0 \
-#             --random_prompt_count 10 \
-#             --gen_random_prompts \
-#             --fixed_max_tokens $range
-#     popd
-#     kill_model_server
-
-# done
 
 # Run real test
 for qps in ${QPS_RANGE}; do
