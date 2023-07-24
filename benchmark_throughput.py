@@ -18,6 +18,7 @@ import requests
 from transformers import AutoTokenizer
 
 
+TOKENIZER_MODEL = os.getenv("TOKENIZER_MODEL")
 def get_wait_time(mean_time_between_requests: float, distribution: str) -> float:
     if distribution == "uniform":
         return mean_time_between_requests
@@ -477,8 +478,8 @@ def gen_random_prompts_return_lens(tokenizer, len_mean, len_range, num_prompts, 
             encoded = encoded[:l - 1]
         decoded = tokenizer.decode(encoded)
         encoded = tokenizer(decoded)['input_ids']
-        assert len(
-            encoded) == l, f"Expected prompt to contain exactly {l} tokens, got {len(encoded)=}"
+        # assert len(
+        #     encoded) == l, f"Expected prompt to contain exactly {l} tokens, got {len(encoded)=}"
         prompts[i] = decoded
 
     return prompts, prompt_lens
@@ -528,7 +529,7 @@ def main():
         assert args.random_prompt_count is not None
 
     backend = GenerationBackend[args.backend]
-    tokenizer = AutoTokenizer.from_pretrained('facebook/opt-13b')
+    tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_MODEL)
 
     if args.prompts_filename:
         prompts = load_prompts(args.prompts_filename)

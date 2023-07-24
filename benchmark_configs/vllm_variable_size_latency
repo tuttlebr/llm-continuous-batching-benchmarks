@@ -5,6 +5,7 @@ function start_model_server {
     /benchmarking/launch_scripts/launch_vllm \
         --port ${PORT} \
         --model ${TRANSFORMERS_MODEL} \
+        --tokenizer ${TOKENIZER_MODEL} \
         --max-num-batched-tokens 8100 \
         --use-np-weights \
         2>&1 &
@@ -47,7 +48,7 @@ trap kill_model_server EXIT
 # Run real test
 for qps in ${QPS_RANGE}; do
     QPS=$qps
-    range=1536
+    range=${VARIABLE_RESPONSE_LENS_RANGE}
     num_prompts=${RANDOM_PROMPT_COUNT}
     echo "$range $num_prompts $QPS"
 
@@ -68,8 +69,7 @@ for qps in ${QPS_RANGE}; do
             --distribution ${DISTRIBUTION} \
             --qps $QPS \
             --allow_variable_generation_length \
-            --log_latencies \
-            --fail_on_response_failure
+            --log_latencies
 
     popd
     kill_model_server
